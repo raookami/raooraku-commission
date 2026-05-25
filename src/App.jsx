@@ -289,15 +289,11 @@ export default function App() {
                   padding: '4px 14px',
                   borderRadius: 999,
                   border: 'none',
-                  background: isOpen ? '#e05' : '#0a7',
-                  color: 'white',
+                  background: 'transparent',
+                  cursor: 'default',
                   fontSize: 12,
-                  cursor: 'pointer',
-                  fontWeight: 600,
                 }}
-              >
-                {isOpen ? '' : ''}
-              </button>
+              ></button>
             </div>
 
             {/* Info singkat */}
