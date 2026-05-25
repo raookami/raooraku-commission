@@ -97,11 +97,12 @@ async function handleSubmit(e) {
   const pesan = `
 🎨 **ORDER BARU!**
 👤 **Nama:** ${formData.name}
-📩 **Kontak:** ${formData.contact}
+📱 **Kontak Diskusi:** ${formData.contact}
+📧 **Email:** ${formData.email}
 🖌️ **Jenis:** ${formData.type}
 📝 **Deskripsi:** ${formData.desc}
 🔗 **Referensi:** ${formData.ref || "Tidak ada"}
-  `;
+`;
 
   try {
     await fetch(webhookUrl, {
