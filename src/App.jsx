@@ -262,8 +262,9 @@ async function handleSubmit(e) {
               <img
                 src={img}
                 alt={`karya ${index + 1}`}
+                loading="lazy"
                 style={{ width: "100%", height: 180, objectFit: "cover" }}
-              />
+                />
             </div>
           ))}
       </div>
