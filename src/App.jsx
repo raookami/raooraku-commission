@@ -296,7 +296,7 @@ export default function App() {
                   fontWeight: 600,
                 }}
               >
-                {isOpen ? 'Tutup' : 'Buka'}
+                {isOpen ? '' : ''}
               </button>
             </div>
 
