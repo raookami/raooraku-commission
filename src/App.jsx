@@ -276,7 +276,14 @@ export default function App() {
                 {isOpen ? 'COMMISSION OPEN' : 'COMMISSION CLOSED'}
               </strong>
               <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                  const pw = prompt('Password:');
+                  if (pw === '09000') {
+                    setIsOpen(!isOpen);
+                  } else {
+                    alert('Password salah!');
+                  }
+                }}
                 style={{
                   marginLeft: 'auto',
                   padding: '4px 14px',
