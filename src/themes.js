@@ -1,3 +1,5 @@
+import './styles.css';
+
 // Warna utama
 const blue = '#5e81d1'; // biru utama (brand)
 const blueLight = '#c8d8f8'; // biru muda untuk border
@@ -359,6 +361,17 @@ const dark = {
   textLight: '#6a80a8',
   blue,
   blueLight: '#2a3a5a',
+
+  // Add animation styles
+  heroDesc: {
+    ...light.heroDesc,
+    color: '#8aa0c8',
+    animation: 'fadeIn 1s ease-in-out forwards',
+  },
+  formGroup: {
+    ...light.formGroup,
+    animation: 'pulse 2s 1 ease-in-out', // Mengubah nilai ini
+  },
 
   app: {
     ...light.app,
