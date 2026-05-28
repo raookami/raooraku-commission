@@ -22,3 +22,11 @@
     display: none !important;
   }
 }
+html,
+body,
+#root {
+  background-color: #0d1424; /* samain sama warna dark mode app kamu */
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
