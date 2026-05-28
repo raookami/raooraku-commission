@@ -69,6 +69,19 @@ const commissions = [
   },
 ];
 
+const addons = [
+  { id: 'extra_char', label: 'Extra Character', type: 'percent', value: 50 },
+  {
+    id: 'detailed_bg',
+    label: 'Detailed BG',
+    type: 'range',
+    min: 50000,
+    max: 100000,
+  },
+  { id: 'commercial', label: 'Commercial Use', type: 'multiplier', value: 2 },
+  { id: 'psd', label: 'PSD File', type: 'percent', value: 90 },
+];
+
 // Contoh karya (portfolio) — biasanya ini dari gambar asli kamu
 // Karena ini latihan, kita pakai warna placeholder
 const portfolio = [
@@ -121,6 +134,10 @@ export default function App() {
   // useState = menyimpan data yang bisa berubah
   // "activeTab" = tab mana yang sedang aktif
   // "setActiveTab" = fungsi untuk mengubah tab
+  function goToTab(tab) {
+    setAnimKey((k) => k + 1);
+    setActiveTab(tab);
+  }
   const [activeTab, setActiveTab] = useState('home');
 
   const { isDark, toggleTheme } = useTheme();
@@ -143,6 +160,41 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [lightbox, setLightbox] = useState(null);
   const [loadedImgs, setLoadedImgs] = useState({});
+  const [animKey, setAnimKey] = useState(0);
+  const [selectedAddons, setSelectedAddons] = useState([]);
+
+  function hitungEstimasi() {
+    // Cari harga base dari commission yang dipilih
+    const selected = commissions
+      .flatMap((c) => c.variant.map((v) => ({ ...v, type: c.type })))
+      .find((v) => `${v.type} — ${v.label}` === formData.type);
+
+    if (!selected) return null;
+
+    let minTotal = selected.price;
+    let maxTotal = selected.price;
+
+    selectedAddons.forEach((id) => {
+      const addon = addons.find((a) => a.id === id);
+      if (!addon) return;
+
+      if (addon.type === 'percent') {
+        minTotal += (selected.price * addon.value) / 100;
+        maxTotal += (selected.price * addon.value) / 100;
+      } else if (addon.type === 'range') {
+        minTotal += addon.min;
+        maxTotal += addon.max;
+      } else if (addon.type === 'multiplier') {
+        minTotal *= addon.value;
+        maxTotal *= addon.value;
+      } else if (addon.type === 'fixed') {
+        minTotal += addon.value;
+        maxTotal += addon.value;
+      }
+    });
+
+    return { min: minTotal, max: maxTotal };
+  }
 
   // Preload gambar prev & next saat lightbox aktif
   useEffect(() => {
@@ -171,6 +223,7 @@ export default function App() {
 📱 **Kontak Diskusi:** ${formData.contact}
 📧 **Email:** ${formData.email}
 🖌️ **Jenis:** ${formData.type}
+✨ **Add-ons:** ${selectedAddons.length > 0 ? selectedAddons.map((id) => addons.find((a) => a.id === id)?.label).join(', ') : 'Tidak ada'}
 📝 **Deskripsi:** ${formData.desc}
 🔗 **Referensi:** ${formData.ref || 'Tidak ada'}
 `;
@@ -215,7 +268,7 @@ export default function App() {
             {['home', 'portfolio', 'commission', 'order'].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => goToTab(tab)}
                 style={{
                   ...theme.navBtn,
                   ...(activeTab === tab ? theme.navBtnActive : {}),
@@ -242,7 +295,7 @@ export default function App() {
 
         {/* ===== HALAMAN HOME ===== */}
         {activeTab === 'home' && (
-          <div style={theme.page}>
+          <div key={animKey} className="page-enter" style={theme.page}>
             <div style={theme.hero}>
               <img
                 src="/lv_0_20250116221257.gif"
@@ -260,13 +313,13 @@ export default function App() {
               <div style={theme.heroButtons}>
                 <button
                   style={theme.btnPrimary}
-                  onClick={() => setActiveTab('commission')}
+                  onClick={() => goToTab('commission')}
                 >
                   IDR COMMISSION
                 </button>
                 <button
                   style={theme.btnSecondary}
-                  onClick={() => setActiveTab('portfolio')}
+                  onClick={() => goToTab('portfolio')}
                 >
                   PORTFOLIO
                 </button>
@@ -343,7 +396,7 @@ export default function App() {
 
         {/* ===== HALAMAN PORTFOLIO ===== */}
         {activeTab === 'portfolio' && (
-          <div style={theme.page}>
+          <div key={animKey} className="page-enter" style={theme.page}>
             <h2 style={theme.sectionTitle}>Portfolio</h2>
 
             {/* Tab kategori */}
@@ -561,7 +614,7 @@ export default function App() {
 
         {/* ===== HALAMAN COMMISSION (HARGA) ===== */}
         {activeTab === 'commission' && (
-          <div style={theme.page}>
+          <div key={animKey} className="page-enter" style={theme.page}>
             <h2 style={theme.sectionTitle}>RAWRMISSION</h2>
             <h3 style={theme.sectionDesc}>
               Original character, personal use, commercial use, profile picture,
@@ -603,7 +656,7 @@ export default function App() {
                               ...formData,
                               type: `${c.type} — ${v.label}`,
                             });
-                            setActiveTab('order');
+                            goToTab('order');
                             setSelectedComm(null);
                           }}
                         >
@@ -702,7 +755,7 @@ export default function App() {
 
         {/* ===== HALAMAN ORDER / FORM ===== */}
         {activeTab === 'order' && (
-          <div style={theme.page}>
+          <div key={animKey} className="page-enter" style={theme.page}>
             <h2 style={theme.sectionTitle}>Form Order</h2>
 
             {/* Kondisi: tampilkan sukses ATAU form */}
@@ -737,7 +790,7 @@ export default function App() {
                       desc: '',
                       ref: '',
                     });
-                    setActiveTab('home');
+                    goToTab('home');
                   }}
                 >
                   Kembali ke Beranda
@@ -817,6 +870,77 @@ export default function App() {
                   </select>
                 </div>
 
+                {/* Add-ons */}
+                <div style={theme.formGroup}>
+                  <label style={theme.label}>Add-ons (opsional)</label>
+                  <div
+                    style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+                  >
+                    {addons.map((addon) => (
+                      <label
+                        key={addon.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          cursor: 'pointer',
+                          fontSize: 14,
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedAddons.includes(addon.id)}
+                          onChange={(e) => {
+                            setSelectedAddons((prev) =>
+                              e.target.checked
+                                ? [...prev, addon.id]
+                                : prev.filter((id) => id !== addon.id),
+                            );
+                          }}
+                        />
+                        <span>
+                          <strong>{addon.label}</strong>
+                          <span style={{ color: '#888', marginLeft: 6 }}>
+                            {addon.type === 'percent' &&
+                              `+${addon.value}% per karakter`}
+                            {addon.type === 'range' &&
+                              `+Rp ${addon.min.toLocaleString('id-ID')} – ${addon.max.toLocaleString('id-ID')}`}
+                            {addon.type === 'multiplier' &&
+                              `×${addon.value} total harga`}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Estimasi harga */}
+                {formData.type &&
+                  (() => {
+                    const est = hitungEstimasi();
+                    return est ? (
+                      <div
+                        style={{
+                          background: isDark ? '#1e2a3a' : '#eef2ff',
+                          borderRadius: 10,
+                          padding: '12px 16px',
+                          fontSize: 14,
+                          marginBottom: 8,
+                        }}
+                      >
+                        💰 <strong>Estimasi: </strong>
+                        {est.min === est.max
+                          ? `Rp ${est.min.toLocaleString('id-ID')}`
+                          : `Rp ${est.min.toLocaleString('id-ID')} – ${est.max.toLocaleString('id-ID')}`}
+                        <div
+                          style={{ fontSize: 11, color: '#888', marginTop: 4 }}
+                        >
+                          *Harga final dikonfirmasi setelah diskusi
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+
                 <div style={theme.formGroup}>
                   <label style={theme.label}>
                     Deskripsi Karakter & Request
@@ -883,7 +1007,7 @@ export default function App() {
         ].map(({ tab, icon, label }) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => goToTab(tab)}
             style={{
               flex: 1,
               display: 'flex',
