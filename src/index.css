@@ -1,0 +1,24 @@
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+/* Bottom navbar hanya muncul di mobile */
+@media (max-width: 640px) {
+  .bottom-nav {
+    display: flex !important;
+  }
+
+  /* Beri padding bawah konten supaya tidak tertutup navbar */
+  main {
+    padding-bottom: 80px !important;
+  }
+
+  /* Sembunyikan header nav di mobile */
+  header nav {
+    display: none !important;
+  }
+}

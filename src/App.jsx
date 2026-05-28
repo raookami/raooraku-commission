@@ -5,9 +5,10 @@
 
 // "import" artinya kita ambil alat dari tempat lain
 // useState = alat untuk menyimpan data yang bisa berubah
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from './src/hooks/useTheme';
 import { getTheme, getStatusStyle } from './themes';
+import { imgUrl } from './utils/cloudinary';
 
 // Data commission kita simpan di sini (di luar komponen)
 // Ini seperti "daftar menu" yang nanti ditampilkan
@@ -75,39 +76,39 @@ const portfolio = [
     id: 1,
     label: 'Bust Up',
     imgs: [
-      '/Illustration29.jpg',
-      '/mike kowalski.5.jpg',
-      '/Ilustrasi.jpg',
-      '/8d33286e_original.jpg',
-      '/Illustration42.png',
+      'Illustration29_sgd3xw.jpg',
+      'mike_kowalski.5_qczuzy.jpg',
+      'Ilustrasi_xiwq4u.jpg',
+      '8d33286e_original_fpol3u.jpg',
+      'Illustration42_sw3cwt.png',
     ],
   },
   {
     id: 2,
     label: 'Half Body',
     imgs: [
-      '/Illustration64.png',
-      '/Illustration41.png',
-      '/Illustration32.jpg',
-      '/ryugamine ichigo commission.jpg',
-      '/Illustration31.jpg',
-      '/raoo5325.jpg',
-      '/Illustration35.jpg',
-      '/160723-2.jpg',
-      '/1NewCanvas11.jpg',
-      '/commis shiro6.jpg',
+      'Illustration64_am25jb.png',
+      'Illustration41_xmux38.png',
+      'Illustration32_sk8qhl.jpg',
+      'ryugamine_ichigo_commission_fjgnht.jpg',
+      'Illustration31_qm27sz.jpg',
+      'raoo5325_gt99nr.jpg',
+      'Illustration35_ao7jz9.jpg',
+      '160723-2_upby6p.jpg',
+      '1NewCanvas11_mfeb4o.jpg',
+      'commis_shiro6_krzo8t.jpg',
     ],
   },
   {
     id: 3,
     label: 'Full Body',
     imgs: [
-      '/Illustration58.png',
-      '/Illustration51.png',
-      '/Ilustrasicmmc06524.1-1.jpg',
-      '/Illustration45.png',
-      '/Illustration11.jpg',
-      '/puppy0 (1).jpg',
+      'Illustration58cmmk.png',
+      'Illustration51_kgpo3c.png',
+      'Ilustrasicmmc06524.1-1_gyy9g0.jpg',
+      'Illustration45_oyhpiq.png',
+      'Illustration11_bsfhrr.jpg',
+      'puppy0_1_bkzaw9.jpg',
     ],
   },
 ];
@@ -141,6 +142,21 @@ export default function App() {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [lightbox, setLightbox] = useState(null);
+  const [loadedImgs, setLoadedImgs] = useState({});
+
+  // Preload gambar prev & next saat lightbox aktif
+  useEffect(() => {
+    if (!lightbox) return;
+    const { imgs, index } = lightbox;
+    const preloadIndexes = [
+      (index + 1) % imgs.length,
+      (index - 1 + imgs.length) % imgs.length,
+    ];
+    preloadIndexes.forEach((i) => {
+      const img = new Image();
+      img.src = imgUrl(imgs[i], 1200);
+    });
+  }, [lightbox]);
 
   // Fungsi ini dijalankan saat form dikirim
   async function handleSubmit(e) {
@@ -208,8 +224,6 @@ export default function App() {
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
-
-            {/* Tambahkan ini 👇 */}
             <button
               onClick={toggleTheme}
               style={theme.themeToggle}
@@ -357,7 +371,7 @@ export default function App() {
                     fontSize: 14,
                   }}
                 >
-                  {kategori.label}
+                  {kategori.label} ({kategori.imgs.length})
                 </button>
               ))}
             </div>
@@ -376,34 +390,95 @@ export default function App() {
                   ?.imgs.map((img, index) => (
                     <div
                       key={index}
-                      style={{ ...theme.portfolioCard, cursor: 'zoom-in' }}
-                      onClick={() => setLightbox(img)}
+                      style={{
+                        ...theme.portfolioCard,
+                        cursor: 'zoom-in',
+                        position: 'relative',
+                        overflow: 'hidden',
+                      }}
+                      onClick={() =>
+                        setLightbox({
+                          imgs: portfolio.find((k) => k.id === selectedCategory)
+                            .imgs,
+                          index,
+                        })
+                      }
+                      onMouseEnter={(e) => {
+                        e.currentTarget.querySelector('img').style.transform =
+                          'scale(1.08)';
+                        e.currentTarget.querySelector(
+                          '.overlay',
+                        ).style.opacity = '1';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.querySelector('img').style.transform =
+                          'scale(1)';
+                        e.currentTarget.querySelector(
+                          '.overlay',
+                        ).style.opacity = '0';
+                      }}
                     >
+                      {/* SKELETON */}
+                      {!loadedImgs[img] && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background:
+                              'linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)',
+                            backgroundSize: '200% 100%',
+                            animation: 'shimmer 1.5s infinite',
+                          }}
+                        />
+                      )}
+
+                      {/* IMG */}
                       <img
-                        src={img}
+                        src={imgUrl(img, 400)}
                         alt={`karya ${index + 1}`}
                         loading="lazy"
+                        onLoad={() =>
+                          setLoadedImgs((prev) => ({ ...prev, [img]: true }))
+                        }
                         style={{
                           width: '100%',
                           height: 180,
                           objectFit: 'cover',
+                          display: 'block',
+                          opacity: loadedImgs[img] ? 1 : 0,
+                          transition: 'transform 0.3s ease, opacity 0.3s ease',
                         }}
                       />
+
+                      {/* OVERLAY */}
+                      <div
+                        className="overlay"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'rgba(0,0,0,0.4)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          opacity: 0,
+                          transition: 'opacity 0.3s ease',
+                          fontSize: 32,
+                        }}
+                      >
+                        🔍
+                      </div>
                     </div>
                   ))}
               </div>
             )}
 
-            {/* Lightbox — muncul saat foto diklik */}
+            {/* Lightbox dengan navigasi prev/next */}
             {lightbox && (
               <div
                 onClick={() => setLightbox(null)}
                 style={{
                   position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
+                  inset: 0,
                   background: 'rgba(0,0,0,0.85)',
                   display: 'flex',
                   alignItems: 'center',
@@ -412,15 +487,73 @@ export default function App() {
                   cursor: 'zoom-out',
                 }}
               >
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightbox((lb) => ({
+                      ...lb,
+                      index: (lb.index - 1 + lb.imgs.length) % lb.imgs.length,
+                    }));
+                  }}
+                  style={{
+                    position: 'absolute',
+                    left: 20,
+                    background: 'rgba(255,255,255,0.15)',
+                    border: 'none',
+                    color: 'white',
+                    fontSize: 28,
+                    borderRadius: '50%',
+                    width: 48,
+                    height: 48,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ‹
+                </button>
                 <img
-                  src={lightbox}
+                  src={imgUrl(lightbox.imgs[lightbox.index], 1200)}
                   style={{
                     maxWidth: '90vw',
                     maxHeight: '90vh',
                     borderRadius: 12,
                     objectFit: 'contain',
                   }}
+                  onClick={(e) => e.stopPropagation()}
                 />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightbox((lb) => ({
+                      ...lb,
+                      index: (lb.index + 1) % lb.imgs.length,
+                    }));
+                  }}
+                  style={{
+                    position: 'absolute',
+                    right: 20,
+                    background: 'rgba(255,255,255,0.15)',
+                    border: 'none',
+                    color: 'white',
+                    fontSize: 28,
+                    borderRadius: '50%',
+                    width: 48,
+                    height: 48,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ›
+                </button>
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 20,
+                    color: 'white',
+                    fontSize: 13,
+                    opacity: 0.7,
+                  }}
+                >
+                  {lightbox.index + 1} / {lightbox.imgs.length}
+                </div>
               </div>
             )}
           </div>
@@ -727,6 +860,76 @@ export default function App() {
           Instagram: @raooraku_ · Discord: RAOORAKU
         </p>
       </footer>
+      {/* BOTTOM NAVBAR — hanya muncul di mobile */}
+      <nav
+        style={{
+          display: 'none', // default hidden, override lewat CSS
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: isDark ? '#1e1e2e' : '#ffffff',
+          borderTop: isDark ? '1px solid #333' : '1px solid #e0e0e0',
+          zIndex: 100,
+          padding: '6px 0 10px',
+        }}
+        className="bottom-nav"
+      >
+        {[
+          { tab: 'home', icon: '🏠', label: 'Home' },
+          { tab: 'portfolio', icon: '🖼️', label: 'Portfolio' },
+          { tab: 'commission', icon: '🎨', label: 'Commission' },
+          { tab: 'order', icon: '📝', label: 'Order' },
+        ].map(({ tab, icon, label }) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px 0',
+              color: activeTab === tab ? '#5e81d1' : isDark ? '#888' : '#aaa',
+              transition: 'color 0.2s',
+            }}
+          >
+            <span style={{ fontSize: 20 }}>{icon}</span>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: activeTab === tab ? 700 : 400,
+              }}
+            >
+              {label}
+            </span>
+          </button>
+        ))}
+
+        {/* Toggle theme di pojok */}
+        <button
+          onClick={toggleTheme}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '4px 0',
+            color: isDark ? '#888' : '#aaa',
+          }}
+        >
+          <span style={{ fontSize: 20 }}>{isDark ? '☀️' : '🌙'}</span>
+          <span style={{ fontSize: 10 }}>Theme</span>
+        </button>
+      </nav>
     </div>
   );
 }
