@@ -92,6 +92,7 @@ const light = {
     maxWidth: 900,
     margin: '0 auto',
     padding: '20px 20px 60px',
+    overflowX: 'hidden',
   },
   page: {
     animation: 'fadeIn 0.3s ease',

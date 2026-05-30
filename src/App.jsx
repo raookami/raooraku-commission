@@ -9,6 +9,10 @@ import { useState, useEffect } from 'react';
 import { useTheme } from './src/hooks/useTheme';
 import { getTheme, getStatusStyle } from './themes';
 import { imgUrl } from './utils/cloudinary';
+import ReviewMarquee from './ReviewMarquee';
+import ReviewForm from './ReviewForm';
+import AdminPanel from './AdminPanel';
+import { supabase } from './supabase';
 
 // Data commission kita simpan di sini (di luar komponen)
 // Ini seperti "daftar menu" yang nanti ditampilkan
@@ -265,7 +269,14 @@ export default function App() {
           {/* NAVIGASI — tombol untuk pindah halaman */}
           {/* "nav" = navigation, untuk aksesibilitas */}
           <nav style={theme.nav}>
-            {['home', 'portfolio', 'commission', 'order'].map((tab) => (
+            {[
+              'home',
+              'portfolio',
+              'commission',
+              'order',
+              'reviews',
+              'admin',
+            ].map((tab) => (
               <button
                 key={tab}
                 onClick={() => goToTab(tab)}
@@ -274,7 +285,9 @@ export default function App() {
                   ...(activeTab === tab ? theme.navBtnActive : {}),
                 }}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'admin'
+                  ? '🔐'
+                  : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
             <button
@@ -295,101 +308,105 @@ export default function App() {
 
         {/* ===== HALAMAN HOME ===== */}
         {activeTab === 'home' && (
-          <div key={animKey} className="page-enter" style={theme.page}>
-            <div style={theme.hero}>
-              <img
-                src="/lv_0_20250116221257.gif"
-                style={{
-                  width: 100,
-                  height: 100,
-                  borderRadius: '100%',
-                  objectFit: 'cover',
-                }}
-              />
-              <h2 style={theme.heroTitle}>HI! I'M RAOORAKU ✨</h2>
-              <p style={theme.heroDesc}>
-                specialize in cute male character design.
-              </p>
-              <div style={theme.heroButtons}>
-                <button
-                  style={theme.btnPrimary}
-                  onClick={() => goToTab('commission')}
-                >
-                  IDR COMMISSION
-                </button>
-                <button
-                  style={theme.btnSecondary}
-                  onClick={() => goToTab('portfolio')}
-                >
-                  PORTFOLIO
-                </button>
-                <button
-                  style={theme.btnSecondary}
-                  onClick={() =>
-                    window.open('https://vgen.co/raooraku_', '_blank')
-                  }
-                >
-                  USD COMMISSION ↗
-                </button>
-              </div>
-            </div>
+          <div key={animKey} className="page-enter">
+            <ReviewMarquee isDark={isDark} />
 
-            {/* Status commission */}
-            <div
-              style={{
-                ...theme.statusBox,
-                ...getStatusStyle(isOpen, isDark),
-                color: isOpen ? '#5ed15e' : '#ca5b5b',
-              }}
-            >
-              <span
-                style={{
-                  ...theme.statusDot,
-                  background: isOpen ? '#0c0' : '#e00',
-                }}
-              ></span>
-              <strong>
-                {isOpen ? 'COMMISSION OPEN' : 'COMMISSION CLOSED'}
-              </strong>
-              <button
-                onClick={() => {
-                  const pw = prompt('Password:');
-                  if (pw === '09000') {
-                    setIsOpen(!isOpen);
-                  } else {
-                    alert('Password salah!');
-                  }
-                }}
-                style={{
-                  marginLeft: 'auto',
-                  padding: '4px 14px',
-                  borderRadius: 999,
-                  border: 'none',
-                  background: 'transparent',
-                  cursor: 'default',
-                  fontSize: 12,
-                }}
-              ></button>
-            </div>
-
-            {/* Info singkat */}
-            <div style={theme.infoGrid}>
-              {[
-                { icon: '⏱️', label: 'Estimasi', value: '7–14 hari kerja' },
-                {
-                  icon: '💳',
-                  label: 'Pembayaran',
-                  value: 'Transfer Bank / E-WALLET',
-                },
-                { icon: '🔄', label: 'Revisi', value: '2x revisi minor' },
-                { icon: '📩', label: 'Format', value: 'PNG / JPG 300dpi' },
-              ].map((info) => (
-                <div key={info.label} style={theme.infoCard}>
-                  <div style={theme.infoIcon}>{info.icon}</div>
-                  <div style={theme.infoLabel}>{info.label}</div>
-                  <div style={theme.infoValue}>{info.value}</div>
+            <div style={theme.page}>
+              <div style={theme.hero}>
+                <img
+                  src="/lv_0_20250116221257.gif"
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+                <h2 style={theme.heroTitle}>HI! I'M RAOORAKU ✨</h2>
+                <p style={theme.heroDesc}>
+                  specialize in cute male character design.
+                </p>
+                <div style={theme.heroButtons}>
+                  <button
+                    style={theme.btnPrimary}
+                    onClick={() => goToTab('commission')}
+                  >
+                    IDR COMMISSION
+                  </button>
+                  <button
+                    style={theme.btnSecondary}
+                    onClick={() => goToTab('portfolio')}
+                  >
+                    PORTFOLIO
+                  </button>
+                  <button
+                    style={theme.btnSecondary}
+                    onClick={() =>
+                      window.open('https://vgen.co/raooraku_', '_blank')
+                    }
+                  >
+                    USD COMMISSION ↗
+                  </button>
                 </div>
-              ))}
+              </div>
+
+              {/* Status commission */}
+              <div
+                style={{
+                  ...theme.statusBox,
+                  ...getStatusStyle(isOpen, isDark),
+                  color: isOpen ? '#5ed15e' : '#ca5b5b',
+                }}
+              >
+                <span
+                  style={{
+                    ...theme.statusDot,
+                    background: isOpen ? '#0c0' : '#e00',
+                  }}
+                ></span>
+                <strong>
+                  {isOpen ? 'COMMISSION OPEN' : 'COMMISSION CLOSED'}
+                </strong>
+                <button
+                  onClick={() => {
+                    const pw = prompt('Password:');
+                    if (pw === '09000') {
+                      setIsOpen(!isOpen);
+                    } else {
+                      alert('Password salah!');
+                    }
+                  }}
+                  style={{
+                    marginLeft: 'auto',
+                    padding: '4px 14px',
+                    borderRadius: 999,
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'default',
+                    fontSize: 12,
+                  }}
+                ></button>
+              </div>
+
+              {/* Info singkat */}
+              <div style={theme.infoGrid}>
+                {[
+                  { icon: '⏱️', label: 'Estimasi', value: '7–14 hari kerja' },
+                  {
+                    icon: '💳',
+                    label: 'Pembayaran',
+                    value: 'Transfer Bank / E-WALLET',
+                  },
+                  { icon: '🔄', label: 'Revisi', value: '2x revisi minor' },
+                  { icon: '📩', label: 'Format', value: 'PNG / JPG 300dpi' },
+                ].map((info) => (
+                  <div key={info.label} style={theme.infoCard}>
+                    <div style={theme.infoIcon}>{info.icon}</div>
+                    <div style={theme.infoLabel}>{info.label}</div>
+                    <div style={theme.infoValue}>{info.value}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -976,6 +993,38 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* ===== HALAMAN REVIEWS ===== */}
+      {activeTab === 'reviews' && (
+        <div
+          key={animKey}
+          className="page-enter"
+          style={{
+            ...theme.page,
+            maxWidth: 560, // ← tambah ini
+            margin: '0 auto', // ← dan ini
+          }}
+        >
+          <h2 style={theme.sectionTitle}>⭐ Ulasan Klien</h2>
+          <p
+            style={{
+              fontSize: 14,
+              color: isDark ? '#aaa' : '#888',
+              marginBottom: 8,
+            }}
+          >
+            Kata mereka yang udah pernah order 💙
+          </p>
+          <ReviewForm theme={theme} isDark={isDark} />
+        </div>
+      )}
+
+      {/* ===== HALAMAN ADMIN ===== */}
+      {activeTab === 'admin' && (
+        <div key={animKey} className="page-enter" style={theme.page}>
+          <AdminPanel theme={theme} isDark={isDark} />
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer style={theme.footer}>
