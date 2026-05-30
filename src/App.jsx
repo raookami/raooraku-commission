@@ -260,10 +260,21 @@ export default function App() {
       {/* HEADER — bagian atas halaman */}
       <header style={theme.header}>
         <div style={theme.headerInner}>
-          <div>
-            {/* Nama artist kamu */}
-            <h1 style={theme.logo}>🐺 RAOORAKU </h1>
-            <p style={theme.tagline}>Illustrator · Commission Open</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div>
+              <h1 style={theme.logo}>🐺 RAOORAKU</h1>
+              <p style={theme.tagline}>Illustrator · Commission Open</p>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className="mobile-theme-toggle"
+              style={{
+                ...theme.themeToggle,
+                display: 'none',
+              }}
+            >
+              {isDark ? '☀️' : '🌙'}
+            </button>
           </div>
 
           {/* NAVIGASI — tombol untuk pindah halaman */}

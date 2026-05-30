@@ -48,3 +48,9 @@ body,
 .page-enter {
   animation: pageEnter 0.3s ease forwards;
 }
+
+@media (max-width: 640px) {
+  .mobile-theme-toggle {
+    display: flex !important;
+  }
+}
