@@ -1044,7 +1044,7 @@ export default function App() {
             margin: '0 auto',
           }}
         >
-          <h2 style={theme.sectionTitle}>⭐ Ulasan Klien</h2>
+          <h2 style={theme.sectionTitle}>⭐ Review Klien</h2>
           <p
             style={{
               fontSize: 14,
