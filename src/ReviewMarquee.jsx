@@ -150,4 +150,16 @@ export default function ReviewMarquee({ isDark }) {
       </Marquee>
     </div>
   );
+
+  return (
+    <div
+      onClick={onClickReviews}
+      style={{
+        // ... style sama ...
+        cursor: 'pointer',
+      }}
+    >
+      {/* ... isi sama ... */}
+    </div>
+  );
 }

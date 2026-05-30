@@ -13,6 +13,7 @@ import ReviewMarquee from './ReviewMarquee';
 import ReviewForm from './ReviewForm';
 import AdminPanel from './AdminPanel';
 import { supabase } from './supabase';
+import ReviewList from './ReviewList';
 
 // Data commission kita simpan di sini (di luar komponen)
 // Ini seperti "daftar menu" yang nanti ditampilkan
@@ -320,7 +321,10 @@ export default function App() {
         {/* ===== HALAMAN HOME ===== */}
         {activeTab === 'home' && (
           <div key={animKey} className="page-enter">
-            <ReviewMarquee isDark={isDark} />
+            <ReviewMarquee
+              isDark={isDark}
+              onClickReviews={() => goToTab('reviews')}
+            />
 
             <div style={theme.page}>
               <div style={theme.hero}>
@@ -1012,8 +1016,8 @@ export default function App() {
           className="page-enter"
           style={{
             ...theme.page,
-            maxWidth: 560, // ← tambah ini
-            margin: '0 auto', // ← dan ini
+            maxWidth: 560,
+            margin: '0 auto',
           }}
         >
           <h2 style={theme.sectionTitle}>⭐ Ulasan Klien</h2>
@@ -1021,11 +1025,12 @@ export default function App() {
             style={{
               fontSize: 14,
               color: isDark ? '#aaa' : '#888',
-              marginBottom: 8,
+              marginBottom: 16,
             }}
           >
             Kata mereka yang udah pernah order 💙
           </p>
+          <ReviewList isDark={isDark} /> {/* ← tambah ini */}
           <ReviewForm theme={theme} isDark={isDark} />
         </div>
       )}
@@ -1094,26 +1099,6 @@ export default function App() {
             </span>
           </button>
         ))}
-
-        {/* Toggle theme di pojok */}
-        <button
-          onClick={toggleTheme}
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '4px 0',
-            color: isDark ? '#888' : '#aaa',
-          }}
-        >
-          <span style={{ fontSize: 20 }}>{isDark ? '☀️' : '🌙'}</span>
-          <span style={{ fontSize: 10 }}>Theme</span>
-        </button>
       </nav>
     </div>
   );
