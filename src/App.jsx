@@ -1064,6 +1064,7 @@ export default function App() {
           { tab: 'portfolio', icon: '🖼️', label: 'Portfolio' },
           { tab: 'commission', icon: '🎨', label: 'Commission' },
           { tab: 'order', icon: '📝', label: 'Order' },
+          { tab: 'reviews', icon: '⭐', label: 'Reviews' },
         ].map(({ tab, icon, label }) => (
           <button
             key={tab}
