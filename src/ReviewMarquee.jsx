@@ -63,7 +63,7 @@ function ReviewCard({ review, isDark }) {
   );
 }
 
-export default function ReviewMarquee({ isDark }) {
+export default function ReviewMarquee({ isDark, onClickReviews }) {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -84,6 +84,7 @@ export default function ReviewMarquee({ isDark }) {
 
   return (
     <div
+      onClick={onClickReviews}
       style={{
         overflow: 'hidden',
         width: 'calc(100% + 40px)',
@@ -94,6 +95,7 @@ export default function ReviewMarquee({ isDark }) {
         marginBottom: 16,
         position: 'relative',
         display: 'flex',
+        cursor: 'pointer',
       }}
     >
       {/* Fade kiri + label */}
@@ -148,18 +150,6 @@ export default function ReviewMarquee({ isDark }) {
           </div>
         ))}
       </Marquee>
-    </div>
-  );
-
-  return (
-    <div
-      onClick={onClickReviews}
-      style={{
-        // ... style sama ...
-        cursor: 'pointer',
-      }}
-    >
-      {/* ... isi sama ... */}
     </div>
   );
 }

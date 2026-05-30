@@ -286,6 +286,7 @@ export default function App() {
               'portfolio',
               'commission',
               'order',
+              'ulasan',
               'reviews',
               'admin',
             ].map((tab) => (
@@ -1009,7 +1010,30 @@ export default function App() {
         )}
       </main>
 
-      {/* ===== HALAMAN REVIEWS ===== */}
+      {activeTab === 'ulasan' && (
+        <div
+          key={animKey}
+          className="page-enter"
+          style={{
+            ...theme.page,
+            maxWidth: 560,
+            margin: '0 auto',
+          }}
+        >
+          <h2 style={theme.sectionTitle}>✍️ Tulis Ulasan</h2>
+          <p
+            style={{
+              fontSize: 14,
+              color: isDark ? '#aaa' : '#888',
+              marginBottom: 16,
+            }}
+          >
+            Pernah order? Ceritain pengalaman kamu! 💙
+          </p>
+          <ReviewForm theme={theme} isDark={isDark} />
+        </div>
+      )}
+
       {activeTab === 'reviews' && (
         <div
           key={animKey}
@@ -1030,8 +1054,7 @@ export default function App() {
           >
             Kata mereka yang udah pernah order 💙
           </p>
-          <ReviewList isDark={isDark} /> {/* ← tambah ini */}
-          <ReviewForm theme={theme} isDark={isDark} />
+          <ReviewList isDark={isDark} />
         </div>
       )}
 
@@ -1069,7 +1092,8 @@ export default function App() {
           { tab: 'portfolio', icon: '🖼️', label: 'Portfolio' },
           { tab: 'commission', icon: '🎨', label: 'Commission' },
           { tab: 'order', icon: '📝', label: 'Order' },
-          { tab: 'reviews', icon: '⭐', label: 'Reviews' },
+          { tab: 'reviews', icon: '⭐', label: 'Ulasan' },
+          { tab: 'writereview', icon: '✍️', label: 'Review' },
         ].map(({ tab, icon, label }) => (
           <button
             key={tab}
